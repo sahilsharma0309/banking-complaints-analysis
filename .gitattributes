@@ -1,0 +1,13 @@
+# Normalise line endings so the repo is identical on Windows/macOS/Linux.
+* text=auto eol=lf
+
+# Notebooks: keep diffs readable and avoid CRLF churn.
+*.ipynb text eol=lf
+
+# SQL/markdown are text; binaries are not.
+*.sql   text eol=lf
+*.md    text eol=lf
+*.py    text eol=lf
+*.hyper binary
+*.png   binary
+*.zip   binary

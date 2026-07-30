@@ -1,0 +1,60 @@
+# ---------------------------------------------------------------------------
+# Data — raw and processed data NEVER goes to GitHub.
+# We ignore the *contents* of these folders (not the folders themselves) so the
+# directory structure stays visible to reviewers via .gitkeep.
+# ---------------------------------------------------------------------------
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Any data file anywhere, including Tableau extracts and dashboard CSV backups
+*.csv
+*.zip
+*.gz
+*.parquet
+*.hyper
+*.tde
+
+# ...with ONE deliberate exception: a 1,000-row sample so reviewers can see the
+# data shape without downloading anything. Must stay after the *.csv rule.
+!data/sample_1000.csv
+
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+.env
+.env.local
+*.pgpass
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---------------------------------------------------------------------------
+# Notebooks
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Editors / OS / tooling
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+.claude/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---------------------------------------------------------------------------
+# Tableau working files (the .twb source is committed; local state is not)
+# ---------------------------------------------------------------------------
+*.twbx
+*.twb.bak

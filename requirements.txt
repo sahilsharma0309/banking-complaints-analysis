@@ -1,0 +1,39 @@
+# US Banking Consumer Complaints — Risk & Resolution Analysis
+# Target interpreter: Python 3.11 (see README "How to run" for why not 3.14)
+#
+# Install:  python -m venv venv && venv\Scripts\pip install -r requirements.txt
+# A pinned, fully-resolved snapshot of the environment actually used lives in
+# requirements-lock.txt — install from that for an exact reproduction.
+
+# --- Core data wrangling ---------------------------------------------------
+pandas>=2.2,<3.0
+numpy>=1.26
+
+# --- Data acquisition (CFPB + FDIC + FRED APIs) ----------------------------
+requests>=2.32
+tqdm>=4.66                 # progress bars for the long paginated API pulls
+
+# --- PostgreSQL ------------------------------------------------------------
+psycopg2-binary>=2.9.9     # needed for the fast COPY bulk-load path
+SQLAlchemy>=2.0
+
+# --- Config / secrets ------------------------------------------------------
+python-dotenv>=1.0
+
+# --- Stats & visualisation -------------------------------------------------
+scipy>=1.13                # chi-square test of independence (Stage 5)
+matplotlib>=3.8
+seaborn>=0.13
+
+# --- Entity resolution -----------------------------------------------------
+rapidfuzz>=3.9             # CFPB company name -> FDIC institution fuzzy match
+
+# --- Notebooks -------------------------------------------------------------
+jupyterlab>=4.2
+ipykernel>=6.29
+
+# --- Tableau extract generation --------------------------------------------
+# Ships a ~68 MB platform-specific binary. Verified to install and import
+# cleanly on Windows / Python 3.11. If it fails on your platform, comment it
+# out — Stage 7 falls back to CSV exports and the pipeline still completes.
+tableauhyperapi>=0.0.19000
