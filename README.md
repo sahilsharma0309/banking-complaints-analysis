@@ -42,6 +42,76 @@ API (not the 5–6 GB bulk download). Raw data is never committed; a 1,000-row
 sample lives at [`data/sample_1000.csv`](data/sample_1000.csv) so you can see the
 schema without downloading anything.
 
+### Scope decision: why credit reporting is excluded
+
+This is the single most consequential choice in the project, so it is stated up
+front rather than buried.
+
+The date window contains **9,478,443 complaints**. Filtering to banking and
+lending products leaves **624,727** — a 93% reduction. The excluded categories:
+
+| Excluded | Rows | Why |
+|---|---:|---|
+| Credit reporting (2 legacy labels) | 8,230,677 | Filed against Equifax, Experian and TransUnion — consumer reporting agencies, **not FDIC-insured depository institutions**. They have no total-assets denominator, so the headline size-adjusted metric is undefined for them. At 87% of all rows they would also dominate every product, issue, state and trend breakdown. |
+| Debt collection | 507,831 | Overwhelmingly third-party collection agencies (Portfolio Recovery, Encore Capital), again not FDIC-insured. |
+| Money transfer / virtual currency | 115,208 | Non-bank fintechs (PayPal, Block, Coinbase, Western Union). Topical, but outside the size-adjusted ranking. |
+
+What remains is **10 product categories that a bank or lender actually sells** —
+checking/savings, credit card, prepaid card, mortgage, auto, student loan,
+payday/personal loan, and debt-or-credit management — which is exactly the
+population the FDIC asset join can normalise.
+
+> **The honest caveat:** this makes the analysis a *banking* risk analysis, not a
+> whole-of-CFPB analysis. Any statement about "consumer complaints" in this
+> project means complaints about banking and lending products. Volume rankings
+> here will not match headline CFPB figures, which are driven by credit reporting.
+
+### Data handling: narrative text is split out, not dropped
+
+`complaint_what_happened` is present on ~46% of rows and accounts for roughly
+70% of the payload. Rather than choosing between "carry the bloat" and "lose the
+text", it is written to a **separate file keyed by `complaint_id`**
+(`data/raw/complaint_narratives.csv`). Stages 2–8 run on the lean quantitative
+table and stay fast; an optional text-analysis stage can join the narratives back
+later without a re-download.
+
+### What the extract actually contains
+
+| | |
+|---|---|
+| Rows | **624,727** (matches the API's reported total exactly) |
+| Date span | 2023-01-01 → 2026-01-01 |
+| Distinct companies | 3,197 |
+| Products | 10 |
+| States/territories | 61 |
+| Complaints with narrative text | 341,894 (54.7%) |
+| `complaints.csv` | 176 MB · `complaint_narratives.csv` 405 MB (both gitignored) |
+
+Rows per year:
+
+| Year | Complaints |
+|---|---:|
+| 2023 | 163,324 |
+| 2024 | 196,037 |
+| 2025 | 264,853 |
+| 2026 | **513** ⚠️ |
+
+> ⚠️ **2026 is a one-day stub.** The window ends 2026-01-01, so 2026 contributes a
+> single day. Left untreated it renders as a cliff in any yearly or monthly trend
+> chart. Stage 2 flags these rows and the trend analysis is bounded to
+> **2023-01-01 → 2025-12-31** (36 complete months) so period-over-period
+> comparisons are like-for-like.
+
+### API gotcha worth knowing
+
+Passing `format=json` to the CFPB search API silently routes the request to the
+**export** endpoint, which caps the result set at 100,000 rows and rejects a
+larger filter with `HTTP 400 — "Result set of 624727 exceeds the export limit of
+100000"`. Omitting `format` entirely uses the normal search endpoint, which
+returns JSON anyway and has no depth limit when paginating with `search_after`.
+The `frm` offset parameter is also silently ignored past the first page, so
+`search_after` is the only workable deep-pagination method.
+
 ## Methodology
 
 1. **Acquisition** — paginated API pull using the `search_after` cursor, with retry/backoff.
