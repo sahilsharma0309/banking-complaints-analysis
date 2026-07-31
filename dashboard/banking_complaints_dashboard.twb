@@ -171,7 +171,7 @@
           <filter class='categorical' column="[federated.company_summary_ds1].[none:is_fdic_matched:nk]">
             <groupfilter function='member' level='[none:is_fdic_matched:nk]' member='true' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
           </filter>
-          <natural-sort column="[federated.company_summary_ds1].[none:company:nk]" direction='DESC' />
+          <sort class='computed' column="[federated.company_summary_ds1].[none:company:nk]" direction='DESC' using="[federated.company_summary_ds1].[avg:complaints_per_1b_assets:qk]" />
           <slices>
             <column>[federated.company_summary_ds1].[none:is_fdic_matched:nk]</column>
             <column>[federated.company_summary_ds1].[none:complaints_per_1b_assets:qk]</column>
@@ -301,7 +301,7 @@
             <column-instance column="[complaints]" derivation="Sum" name="[sum:complaints:qk]" pivot='key' type="quantitative" />
             <column-instance column="[untimely_rate]" derivation="Avg" name="[avg:untimely_rate:qk]" pivot='key' type="quantitative" />
           </datasource-dependencies>
-          <natural-sort column="[federated.state_summary_ds3].[none:state:nk]" direction='DESC' />
+          <sort class='computed' column="[federated.state_summary_ds3].[none:state:nk]" direction='DESC' using="[federated.state_summary_ds3].[sum:complaints:qk]" />
           <slices>
             <column>[federated.state_summary_ds3].[none:state:nk]</column>
           </slices>

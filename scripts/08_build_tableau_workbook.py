@@ -253,8 +253,18 @@ def main() -> None:
             <groupfilter function='member' level='[none:is_fdic_matched:nk]' member='true' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
           </filter>
 """
-    s1_sort = (f"          <natural-sort column={a(cs.ref('[none:company:nk]'))} "
-               f"direction='DESC' />\n")
+    # Sort bars by the measure, descending.
+    #
+    # NOT <natural-sort>. Tableau writes that element into files it saves, but
+    # its own loader rejects it: "no declaration found for element
+    # 'natural-sort'". The schema's content model
+    #   (datasources?, mapsources?, datasource-dependencies*,
+    #    filter, sort, perspectives, slices?, aggregation)
+    # permits <sort>, so the computed-sort form is used instead. It must sit
+    # after the filters and before <slices>.
+    s1_sort = (f"          <sort class='computed' "
+               f"column={a(cs.ref('[none:company:nk]'))} direction='DESC' "
+               f"using={a(cs.ref('[avg:complaints_per_1b_assets:qk]'))} />\n")
     s1_style = (f"          <style-rule element='mark'>\n"
                 f"            <encoding attr='color' center='0.0' "
                 f"field={a(cs.ref('[none:rank_gap:qk]'))} "
@@ -333,8 +343,8 @@ def main() -> None:
                    ("untimely_rate", "Avg", "qk")],
         encodings=[f"              <color column={a(ss.ref('[avg:untimely_rate:qk]'))} />",
                    f"              <text column={a(ss.ref('[sum:complaints:qk]'))} />"],
-        sort=f"          <natural-sort column={a(ss.ref('[none:state:nk]'))} "
-             f"direction='DESC' />\n",
+        sort=f"          <sort class='computed' column={a(ss.ref('[none:state:nk]'))} "
+             f"direction='DESC' using={a(ss.ref('[sum:complaints:qk]'))} />\n",
         slices=[ss.ref("[none:state:nk]")])
 
     # ---------------- Dashboard --------------------------------------------
