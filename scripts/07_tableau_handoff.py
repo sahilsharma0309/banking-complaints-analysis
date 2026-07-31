@@ -83,13 +83,32 @@ SELECT
         WHEN r.match_method = 'inactive_charter'  THEN 'Charter no longer active (merged/acquired)'
         ELSE 'No confident FDIC match'
     END                             AS fdic_status,
-    -- the headline contrast, precomputed so Tableau does not need table calcs
-    RANK() OVER (ORDER BY r.total_complaints DESC)          AS volume_rank,
-    RANK() OVER (ORDER BY r.complaints_per_1b_assets DESC NULLS LAST)
-                                                            AS size_adjusted_rank,
-    CASE WHEN r.complaints_per_1b_assets IS NULL THEN NULL
-         ELSE RANK() OVER (ORDER BY r.total_complaints DESC)
-              - RANK() OVER (ORDER BY r.complaints_per_1b_assets DESC NULLS LAST)
+    -- Rank over ALL scored companies. Informational only -- it answers "how big
+    -- a complaint generator is this overall", including non-banks.
+    RANK() OVER (ORDER BY r.total_complaints DESC)          AS overall_volume_rank,
+
+    -- THE HEADLINE CONTRAST. Both ranks are computed over the SAME population
+    -- (FDIC-matched depositories only, via the PARTITION on matched), because
+    -- subtracting ranks drawn from different populations is meaningless.
+    --
+    -- The first version ranked volume over all 112 scored companies but the
+    -- size-adjusted rate over only the 28 matched ones, then subtracted them.
+    -- That inflated every gap: SoFi read as 32 -> 3 (a "+29 move") when the
+    -- honest comparison within the matched cohort is 18 -> 3 (+15). The symptom
+    -- was a rank_gap range of -23..98 where the true range is -23..18.
+    CASE WHEN r.matched AND r.complaints_per_1b_assets IS NOT NULL
+         THEN RANK() OVER (PARTITION BY (r.matched AND r.complaints_per_1b_assets IS NOT NULL)
+                           ORDER BY r.total_complaints DESC)
+    END                                                     AS volume_rank,
+    CASE WHEN r.matched AND r.complaints_per_1b_assets IS NOT NULL
+         THEN RANK() OVER (PARTITION BY (r.matched AND r.complaints_per_1b_assets IS NOT NULL)
+                           ORDER BY r.complaints_per_1b_assets DESC)
+    END                                                     AS size_adjusted_rank,
+    CASE WHEN r.matched AND r.complaints_per_1b_assets IS NOT NULL
+         THEN RANK() OVER (PARTITION BY (r.matched AND r.complaints_per_1b_assets IS NOT NULL)
+                           ORDER BY r.total_complaints DESC)
+            - RANK() OVER (PARTITION BY (r.matched AND r.complaints_per_1b_assets IS NOT NULL)
+                           ORDER BY r.complaints_per_1b_assets DESC)
     END                                                     AS rank_gap
 FROM {SCHEMA}.company_risk_profile r
 WHERE r.total_complaints >= 500;

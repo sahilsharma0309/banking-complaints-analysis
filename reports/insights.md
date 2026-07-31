@@ -26,22 +26,29 @@ complaint volume. They are not comparable risks. JPMorgan holds **2.2× the
 assets**, so per dollar of balance sheet Wells Fargo generates **2.2× the
 consumer friction**.
 
-Normalising by FDIC total assets reorders the industry:
+Normalising by FDIC total assets reorders the industry. **Both ranks below are
+computed over the same 28 FDIC-matched depositories**, so the move is a
+like-for-like comparison:
 
 | Company | Volume rank | Size-adj. rank | Move | Complaints per $1B |
 |---|---:|---:|---:|---:|
-| **SoFi Technologies** | 32 | **3** | **▲ 29** | 81.3 |
-| **Barclays Bank Delaware** | 25 | **2** | **▲ 23** | 128.7 |
-| **Santander Holdings USA** | 28 | **6** | **▲ 22** | 46.9 |
-| **Synchrony Financial** | 12 | **1** | **▲ 11** | **147.7** |
+| **Optum Bank** | 28 | **10** | **▲ 18** | 25.2 |
+| **First National Bank of Omaha** | 25 | **9** | **▲ 16** | 31.0 |
+| **SoFi Technologies** | 18 | **3** | **▲ 15** | 81.5 |
+| **Barclays Bank Delaware** | 13 | **2** | **▲ 11** | 128.8 |
+| **Synchrony Financial** | 7 | **1** | ▲ 6 | **147.8** |
 | Wells Fargo | 1 | 11 | ▼ 10 | 22.0 |
-| JPMorgan Chase | 2 | 25 | ▼ 23 | 10.1 |
+| Bank of America | 4 | 19 | ▼ 15 | 12.1 |
+| JPMorgan Chase | 2 | 25 | **▼ 23** | 10.1 |
 
-**Synchrony Financial is the headline case.** It is 12th by raw volume — barely
-noticeable on a league table — and **1st in the country per dollar of assets**,
-at 147.7 complaints per $1B against a matched-peer average of 32.3. That is
-**4.6× the peer average**. Anyone monitoring this market by complaint counts
-alone would not have Synchrony on their list at all.
+**Synchrony Financial is the headline case.** It is 7th by volume among these
+peers — and **1st in the country per dollar of assets**, at 147.8 complaints per
+$1B against a matched-peer average of 32.3. That is **4.6× the peer average**,
+and **14.7× JPMorgan**, the second-largest complaint generator in the dataset.
+
+The sharpest reversal is JPMorgan itself: **2nd by raw volume, 25th of 28 once
+size-adjusted**. On a volume league table it looks like one of the worst actors
+in US banking. Per dollar of balance sheet it is one of the best.
 
 **A caveat stated rather than buried:** total assets proxies *balance-sheet
 size*, not *customer count*. Card-focused issuers (Synchrony, Barclays Delaware,

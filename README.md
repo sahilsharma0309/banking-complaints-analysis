@@ -221,16 +221,21 @@ Wells Fargo (41,051 complaints) and JPMorgan Chase (40,391) look like the same
 risk. JPMorgan holds **2.2× the assets** — so per dollar of balance sheet, Wells
 Fargo generates **2.2× the consumer friction**. Normalising reorders the industry:
 
+Both ranks below are computed over the **same 28 FDIC-matched depositories**, so
+the move is like-for-like:
+
 | Company | Volume rank | Size-adjusted rank | Move | Complaints per $1B |
 |---|---:|---:|---:|---:|
-| **SoFi Technologies** | 32 | **3** | ▲ 29 | 81.3 |
-| **Barclays Bank Delaware** | 25 | **2** | ▲ 23 | 128.7 |
-| **Synchrony Financial** | 12 | **1** | ▲ 11 | **147.7** |
+| **SoFi Technologies** | 18 | **3** | ▲ 15 | 81.5 |
+| **Barclays Bank Delaware** | 13 | **2** | ▲ 11 | 128.8 |
+| **Synchrony Financial** | 7 | **1** | ▲ 6 | **147.8** |
 | Wells Fargo | 1 | 11 | ▼ 10 | 22.0 |
-| JPMorgan Chase | 2 | 25 | ▼ 23 | 10.1 |
+| JPMorgan Chase | 2 | 25 | **▼ 23** | 10.1 |
 
-**Synchrony is 12th by volume and 1st in the country per dollar of assets** — 4.6×
-the matched-peer average. Volume-based monitoring would never surface it.
+**Synchrony is 1st in the country per dollar of assets** — 4.6× the matched-peer
+average and **14.7× JPMorgan**. Meanwhile JPMorgan is 2nd by raw volume and 25th
+of 28 once size-adjusted: on a volume league table it looks like one of the worst
+actors in US banking; per dollar of balance sheet it is one of the best.
 
 ![Size-adjusted risk ranking](reports/figures/fig_05_size_adjusted_ranking.png)
 
@@ -409,12 +414,13 @@ number is reproducible from this repo.
 **Option A — emphasises the analytical result**
 
 > Built an end-to-end pipeline analysing **624,708 CFPB banking complaints**
-> (Python, PostgreSQL, Tableau), enriching them with FDIC asset data via
-> fuzzy entity matching to compute a size-adjusted risk metric; found that
-> **raw complaint volume misranks the industry** — one lender placed 12th by
-> volume but **1st nationally per $1B of assets (4.6× peer average)** — and
-> proved via chi-square (Cramér's V 0.34 vs 0.19, n=624k) that complaint
-> outcome depends **1.8× more on the company than the product**.
+> (Python, PostgreSQL, Tableau), enriching them with FDIC asset data via fuzzy
+> entity matching to compute a size-adjusted risk metric; showed that **raw
+> complaint volume misranks the industry** — the 2nd-largest complaint generator
+> ranks **25th of 28 once normalised by assets**, while the worst performer runs
+> at **4.6× the peer average** — and proved via chi-square (Cramér's V 0.34 vs
+> 0.19, n=624k) that complaint outcome depends **1.8× more on the company than
+> the product**.
 
 **Option B — emphasises the engineering**
 
