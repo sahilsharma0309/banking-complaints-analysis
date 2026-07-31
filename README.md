@@ -180,10 +180,31 @@ kind).
 
 ### Headline metric
 
-**Size-adjusted risk = complaints per $1B of total assets.** Documented with its
-caveats (notably: the FDIC denominator only covers insured depository
-institutions, so non-bank lenders and credit bureaus are excluded from this
-ranking rather than silently mis-ranked).
+**Size-adjusted risk = complaints per $1B of total assets.**
+
+Two rules keep it honest, both documented in
+[`reports/enrichment_log.md`](reports/enrichment_log.md):
+
+**Assets are summed across all charters under a holding company.** One CFPB
+company can own several FDIC charters. Using only the largest would understate
+the denominator — and therefore *inflate* the risk rate — by 38.2% for Morgan
+Stanley, 19.8% for Popular Inc, 13.5% for Charles Schwab. (A related trap: 683
+institutions have no holding company at all, and grouping on that blank field
+would fuse 683 independent banks into one fictional $822B entity.)
+
+**Unmatched companies are reported, not dropped.** 50% of complaint volume
+belongs to entities with no FDIC assets *by design* — credit bureaus, NCUA credit
+unions, loan servicers, fintechs. They keep every volume, trend and
+resolution-rate metric; they drop out of the size-adjusted ranking only, and the
+"unmatched but high-volume" list is published as a finding in itself.
+
+**On fuzzy matching:** every guard in the matcher was added in response to a
+specific false positive found in review, not designed up front. The first version
+matched `Ocwen Financial Corporation` to `OWEN FINANCIAL CORP` — a $0.4B
+community bank, one letter apart — producing a confident **7,923 complaints per
+$1B**. The final matcher requires an exact normalised match, or two exact
+distinctive tokens plus a Jaccard floor. A plausibility sweep flags any ratio
+above 300/$1B and currently returns nothing.
 
 ## Key findings
 
