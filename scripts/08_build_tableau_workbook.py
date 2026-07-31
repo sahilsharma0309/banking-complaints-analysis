@@ -211,10 +211,37 @@ def worksheet(name: str, ds: DS, *, rows: str, cols: str, mark: str,
     </worksheet>"""
 
 
+def tableau_has_edited(path: Path) -> bool:
+    """Has Tableau saved over this file since we generated it?
+
+    Tableau rewrites a workbook on save, expanding it with <metadata-records>,
+    <thumbnails> and window state that this generator never emits. Their
+    presence means the file contains the user's own work.
+    """
+    if not path.exists():
+        return False
+    head = path.read_text(encoding="utf-8", errors="ignore")
+    return "<metadata-records>" in head or "<thumbnails>" in head
+
+
 def main() -> None:
     if not HYPER.exists():
         sys.exit(f"missing {HYPER}\n  run: python scripts/07_tableau_handoff.py "
                  f"(close Tableau first if it has the file open)")
+
+    # Guard against destroying manual work. Once the workbook has been opened,
+    # edited and saved in Tableau, regenerating it silently throws away titles,
+    # legends, formatting and layout tweaks -- with no warning and no undo.
+    if tableau_has_edited(OUT) and "--force" not in sys.argv:
+        sys.exit(
+            f"\n  REFUSING TO OVERWRITE {OUT.name}\n\n"
+            f"  Tableau has saved this workbook, so it now contains your own\n"
+            f"  edits (titles, legends, formatting, layout). Regenerating would\n"
+            f"  discard all of it.\n\n"
+            f"  Options:\n"
+            f"    - keep editing in Tableau (the generator's job is done)\n"
+            f"    - re-run with --force to discard your edits and rebuild\n"
+            f"    - rename/copy your version first, then --force\n")
 
     frames, dss = {}, {}
     for i, t in enumerate(TABLES, start=1):
