@@ -56,9 +56,16 @@ desktop.ini
 # ---------------------------------------------------------------------------
 # Tableau working files (the .twb source is committed; local state is not)
 # ---------------------------------------------------------------------------
+# NOTE: .gitignore has no inline comments. A trailing "# ..." is read as part of
+# the pattern, so a rule written as `hyperd.log  # dropped by hyper` silently
+# matches nothing. Comments must sit on their own line, as they do here.
 *.twbx
 *.twb.bak
-~*.twbr             # Tableau autosave/recovery temp files
+
+# Tableau autosave / recovery temp files
+~*.twbr
 ~*.twb
-hyperd.log          # dropped in the CWD by tableauhyperapi's HyperProcess
+
+# Dropped in the working directory by tableauhyperapi's HyperProcess
+hyperd.log
 *.log
