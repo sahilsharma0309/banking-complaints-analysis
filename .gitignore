@@ -58,3 +58,5 @@ desktop.ini
 # ---------------------------------------------------------------------------
 *.twbx
 *.twb.bak
+hyperd.log          # dropped in the CWD by tableauhyperapi's HyperProcess
+*.log
