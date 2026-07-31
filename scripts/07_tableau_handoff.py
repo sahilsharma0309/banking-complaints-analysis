@@ -289,6 +289,14 @@ def main() -> None:
             log(f"{path.name:<28} {len(df):>7,} rows  {path.stat().st_size/1024:>7.0f} KB")
 
     banner("TABLEAU .hyper EXTRACT")
+    # Date columns arrive from psycopg2 as Python date objects, which pandas
+    # holds as dtype=object -> the extract writer would type them as TEXT and
+    # Tableau would render a string axis instead of a real date axis (no
+    # continuous months, no date filter). Declared explicitly instead.
+    DATE_COLUMNS = {
+        "monthly_trend": ["month_start"],
+        "company_summary": ["first_complaint", "last_complaint"],
+    }
     try:
         from tableauhyperapi import (Connection, HyperProcess, SqlType, TableDefinition,
                                      TableName, Telemetry, Inserter, CreateMode)
@@ -313,12 +321,19 @@ def main() -> None:
                 conn.catalog.create_schema("Extract")
                 for name, df in frames.items():
                     d = df.copy()
+                    date_cols = DATE_COLUMNS.get(name, [])
+                    for col in date_cols:
+                        if col in d.columns:
+                            d[col] = pd.to_datetime(d[col], errors="coerce").dt.date
                     for col in d.columns:
+                        if col in date_cols:
+                            continue
                         if d[col].dtype.kind == "O":
                             d[col] = d[col].astype(str).replace({"nan": None, "None": None})
                     tdef = TableDefinition(
                         TableName("Extract", name),
-                        [TableDefinition.Column(c, sql_type(d[c].dtype))
+                        [TableDefinition.Column(
+                            c, SqlType.date() if c in date_cols else sql_type(d[c].dtype))
                          for c in d.columns])
                     conn.catalog.create_table(tdef)
                     with Inserter(conn, tdef) as ins:

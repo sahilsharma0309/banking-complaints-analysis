@@ -1,5 +1,20 @@
 # Tableau build guide
 
+> ## ⚡ Shortcut: open the pre-built workbook
+>
+> ```bash
+> venv\Scripts\python scripts\07_tableau_handoff.py        # builds the .hyper
+> venv\Scripts\python scripts\08_build_tableau_workbook.py # builds the .twb
+> ```
+>
+> Then double-click **`dashboard/banking_complaints_dashboard.twb`**. All four
+> sheets and the assembled dashboard are already built — nothing to drag, no
+> relationship dialogs.
+>
+> The rest of this guide is the manual path. It is still worth reading once: it
+> explains *what* the generated XML encodes and why each choice was made, and
+> you will need §7 to publish either way.
+
 Everything is prepared. This walks you from a blank Tableau Desktop to a
 published Tableau Public dashboard.
 
