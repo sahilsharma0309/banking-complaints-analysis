@@ -167,6 +167,24 @@ def worksheet(name: str, ds: DS, *, rows: str, cols: str, mark: str,
               encodings: list[str] = (), filters: str = "",
               slices: list[str] = (), extra_style: str = "",
               sort: str = "") -> str:
+    """Emit one <worksheet>.
+
+    The child order inside <view> is NOT free -- Tableau validates against
+    the content model:
+        (datasources?, mapsources?, datasource-dependencies*,
+         filter, sort, perspectives, slices?, aggregation)
+    A missing trailing <aggregation> produces
+    "missing elements in content model", and elements out of order produce
+    "element X is not allowed for content model".
+    """
+    slices_xml = ""
+    if slices:
+        slices_xml = ("          <slices>\n"
+                      + "\n".join(f"            <column>{escape(s)}</column>"
+                                  for s in slices)
+                      + "\n          </slices>\n")
+    style_xml = f"        <style>\n{extra_style}        </style>\n" if extra_style \
+        else "        <style />\n"
     return f"""    <worksheet name={a(name)}>
       <table>
         <view>
@@ -174,13 +192,9 @@ def worksheet(name: str, ds: DS, *, rows: str, cols: str, mark: str,
             <datasource caption={a(ds.caption)} name={a(ds.name)} />
           </datasources>
 {dep_block(ds, used_cols, instances)}
-{filters}{sort}          <slices>
-{chr(10).join(f'            <column>{escape(s)}</column>' for s in slices)}
-          </slices>
+{filters}{sort}{slices_xml}          <aggregation value='true' />
         </view>
-        <style>
-{extra_style}        </style>
-        <panes>
+{style_xml}        <panes>
           <pane selection-relaxation-option='selection-relaxation-allow'>
             <view>
               <breakdown value='auto' />
@@ -300,38 +314,51 @@ def main() -> None:
                    f"              <lod column={a(cs.ref('[none:company:nk]'))} />"],
         slices=[cs.ref("[none:company:nk]"), cs.ref("[none:risk_tier:nk]")])
 
-    # ---------------- Sheet 4: state map ------------------------------------
+    # ---------------- Sheet 4: by state -------------------------------------
+    # Deliberately a BAR, not a map. A filled map needs Tableau's generated
+    # Latitude/Longitude fields, which only exist after Tableau has assigned the
+    # geographic role at load time -- referencing them in hand-written XML is
+    # fragile, and mark class 'Map' is not even in the schema's enumeration.
+    # A working bar beats a broken map; the state column still carries its
+    # semantic-role, so double-clicking `State` in the Data pane converts this
+    # to a map in one action.
     sheet4 = worksheet(
         "4. By State", ss,
-        rows="[federated.state_summary_ds3].[none:Latitude (generated):qk]",
-        cols="[federated.state_summary_ds3].[none:Longitude (generated):qk]",
-        mark="Map",
+        rows=ss.ref("[none:state:nk]"),
+        cols=ss.ref("[sum:complaints:qk]"),
+        mark="Bar",
         used_cols=["state", "complaints", "monetary_relief_rate", "untimely_rate",
                    "top_issue", "top_product", "companies"],
-        instances=[("state", "None", "nk"), ("complaints", "Sum", "qk")],
-        encodings=[f"              <color column={a(ss.ref('[sum:complaints:qk]'))} />",
-                   f"              <lod column={a(ss.ref('[none:state:nk]'))} />"],
+        instances=[("state", "None", "nk"), ("complaints", "Sum", "qk"),
+                   ("untimely_rate", "Avg", "qk")],
+        encodings=[f"              <color column={a(ss.ref('[avg:untimely_rate:qk]'))} />",
+                   f"              <text column={a(ss.ref('[sum:complaints:qk]'))} />"],
+        sort=f"          <natural-sort column={a(ss.ref('[none:state:nk]'))} "
+             f"direction='DESC' />\n",
         slices=[ss.ref("[none:state:nk]")])
 
     # ---------------- Dashboard --------------------------------------------
-    def zone(sheet, x, y, w, h):
-        return (f"          <zone h='{h}' id='{abs(hash(sheet)) % 900 + 20}' "
-                f"name={a(sheet)} w='{w}' x='{x}' y='{y}' />")
+    # Zone ids are a deterministic counter, NOT hash(). Python randomises string
+    # hashes per process (PYTHONHASHSEED), so hash-derived ids would change on
+    # every run and could collide -- producing a workbook that differs each time
+    # it is generated, which defeats the point of generating it.
+    #
+    # Flat absolute layout inside one layout-basic root: simplest structure that
+    # Tableau accepts. Coordinates are in ten-thousandths of the dashboard.
+    grid = [("1. Size-Adjusted Risk", 0, 0),
+            ("2. Monthly Trend", 50000, 0),
+            ("3. Resolution Quality", 0, 50000),
+            ("4. By State", 50000, 50000)]
+    zones = "\n".join(
+        f"          <zone h='50000' id='{i}' name={a(s)} w='50000' x='{x}' y='{y}' />"
+        for i, (s, x, y) in enumerate(grid, start=4))
 
     dashboard = f"""    <dashboard name='Dashboard'>
       <style />
       <size maxheight='900' maxwidth='1600' minheight='900' minwidth='1600' />
       <zones>
-        <zone h='100000' id='1' type-v2='layout-basic' w='100000' x='0' y='0'>
-          <zone h='8000' id='2' param='vert' type-v2='title' w='100000' x='0' y='0' />
-          <zone h='46000' id='3' type-v2='layout-flow' w='100000' x='0' y='8000'>
-{zone('1. Size-Adjusted Risk', 0, 8000, 50000, 46000)}
-{zone('2. Monthly Trend', 50000, 8000, 50000, 46000)}
-          </zone>
-          <zone h='46000' id='6' type-v2='layout-flow' w='100000' x='0' y='54000'>
-{zone('3. Resolution Quality', 0, 54000, 50000, 46000)}
-{zone('4. By State', 50000, 54000, 50000, 46000)}
-          </zone>
+        <zone h='100000' id='3' type-v2='layout-basic' w='100000' x='0' y='0'>
+{zones}
         </zone>
       </zones>
     </dashboard>"""
@@ -339,10 +366,27 @@ def main() -> None:
     sheets = [sheet1, sheet2, sheet3, sheet4]
     ds_xml = "\n".join(d.xml() for d in dss.values())
 
+    sheet_titles = ["1. Size-Adjusted Risk", "2. Monthly Trend",
+                    "3. Resolution Quality", "4. By State"]
+
+    # A <window class='worksheet'> must contain (cards, viewpoint?) -- a
+    # self-closing <window /> fails validation with "element 'window' is not
+    # allowed for content model '((cards,viewpoint?)|(viewpoints,active,
+    # device-preview))'". The dashboard window needs the second alternative,
+    # which is fiddlier, so it is omitted entirely: Tableau recreates window
+    # state on open, and <windows> is not required for the workbook to load.
+    windows = "\n".join(
+        f"    <window class='worksheet' name={a(s)}>\n"
+        f"      <cards />\n"
+        f"    </window>" for s in sheet_titles)
+
+    # SOURCE-BUILD IS REQUIRED. Without it Tableau reports
+    # "Error(4,125): missing required attribute 'source-build'" and then fails
+    # every downstream element because it cannot resolve the version schema.
     twb = f"""<?xml version='1.0' encoding='utf-8' ?>
 
 <!-- Generated by scripts/08_build_tableau_workbook.py -->
-<workbook original-version='18.1' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+<workbook original-version='18.1' source-build='2026.1.1 (20261.26.0410.0924)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <preferences>
     <preference name='ui.encoding.shelf.height' value='24' />
     <preference name='ui.shelf.height' value='26' />
@@ -357,12 +401,7 @@ def main() -> None:
 {dashboard}
   </dashboards>
   <windows source-height='30'>
-{chr(10).join(f"    <window class='worksheet' name={a(s)} />" for s in ['1. Size-Adjusted Risk', '2. Monthly Trend', '3. Resolution Quality', '4. By State'])}
-    <window class='dashboard' maximized='true' name='Dashboard'>
-      <viewpoints>
-{chr(10).join(f"        <viewpoint name={a(s)} />" for s in ['1. Size-Adjusted Risk', '2. Monthly Trend', '3. Resolution Quality', '4. By State'])}
-      </viewpoints>
-    </window>
+{windows}
   </windows>
 </workbook>
 """
