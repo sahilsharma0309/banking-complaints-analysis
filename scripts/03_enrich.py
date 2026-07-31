@@ -569,6 +569,16 @@ def main() -> None:
     enriched["complaints_per_1b_assets"] = (
         enriched["total_complaints"] / enriched["total_assets_b"]).round(3)
     enriched.loc[~enriched["matched"].fillna(False), "complaints_per_1b_assets"] = pd.NA
+
+    # Counts must stay integers. The left join above introduces NaN for
+    # companies with no resolved complaints, which silently promotes these
+    # columns to float64 and writes '41078.0' to the CSV -- which then fails to
+    # COPY into an INTEGER column in Stage 4. Nullable Int64 keeps the NULLs
+    # while writing clean integers.
+    for col in ["resolved_complaints", "monetary_relief_n", "untimely_n",
+                "n_charters"]:
+        enriched[col] = enriched[col].astype("Int64")
+    enriched["matched"] = enriched["matched"].fillna(False).astype(bool)
     enriched = enriched.sort_values("total_complaints", ascending=False)
     enriched.to_csv(ENRICHED_CSV, index=False)
     log(f"wrote {ENRICHED_CSV.name}: {len(enriched):,} companies")
