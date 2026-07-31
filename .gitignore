@@ -58,5 +58,7 @@ desktop.ini
 # ---------------------------------------------------------------------------
 *.twbx
 *.twb.bak
+~*.twbr             # Tableau autosave/recovery temp files
+~*.twb
 hyperd.log          # dropped in the CWD by tableauhyperapi's HyperProcess
 *.log
