@@ -69,3 +69,6 @@ desktop.ini
 # Dropped in the working directory by tableauhyperapi's HyperProcess
 hyperd.log
 *.log
+
+# Stray copy at repo root; canonical is reports/ and the site copy is docs/
+/PROJECT_HANDBOOK.pdf
