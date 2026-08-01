@@ -279,6 +279,8 @@ that month (**28 of 28 companies hold rank**).
 
 ### ▶ [**Explore the interactive dashboard on Tableau Public**](https://public.tableau.com/views/banking_complaints_dashboard/Dashboard)
 
+[![Tableau dashboard](reports/figures/dashboard_screenshot.png)](https://public.tableau.com/views/banking_complaints_dashboard/Dashboard)
+
 Four linked views: size-adjusted risk ranking, monthly trend by product,
 resolution-quality scatter, and state-level geography.
 

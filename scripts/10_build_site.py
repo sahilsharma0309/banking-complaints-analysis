@@ -223,7 +223,10 @@ PAGE = f"""<!doctype html>
     <div class="card"><h4>Geography</h4><p>State-level volume and resolution rates across the
       50 states and DC.</p></div>
   </div>
-  <p style="margin-top:22px"><a class="btn p" href="{TABLEAU}">Open the dashboard on Tableau Public</a></p>
+  <figure><a href="{TABLEAU}"><img src="assets/dashboard_screenshot.png"
+    alt="Tableau dashboard: size-adjusted risk, monthly trend, resolution quality, geography"></a>
+  <figcaption>The published dashboard &mdash; click to open the interactive version</figcaption></figure>
+  <p style="margin-top:10px"><a class="btn p" href="{TABLEAU}">Open the dashboard on Tableau Public</a></p>
 </div></section>
 
 <section><div class="wrap">
@@ -376,7 +379,8 @@ def main() -> None:
 
     used = ["fig_01_monthly_trend_overall.png",
             "fig_03_chisquare_residuals_product.png",
-            "fig_05_size_adjusted_ranking.png"]
+            "fig_05_size_adjusted_ranking.png",
+            "dashboard_screenshot.png"]
     for f in used:
         src = FIGS / f
         if src.exists():
