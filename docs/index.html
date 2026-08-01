@@ -108,7 +108,8 @@ footer a{margin:0 10px}
   <em>what</em> you complain about.</p>
 
   <div class="cta">
-    <a class="btn p" href="https://github.com/sahilsharma0309/banking-complaints-analysis">View the code on GitHub</a>
+    <a class="btn p" href="https://public.tableau.com/views/banking_complaints_dashboard/Dashboard">Explore the live dashboard</a>
+    <a class="btn s" href="https://github.com/sahilsharma0309/banking-complaints-analysis">View the code on GitHub</a>
     <a class="btn s" href="https://github.com/sahilsharma0309/banking-complaints-analysis/blob/main/reports/insights.md">Read the business report</a>
     <a class="btn s" href="https://github.com/sahilsharma0309/banking-complaints-analysis/blob/main/notebooks/eda.ipynb">Analysis notebook</a>
   </div>
@@ -165,6 +166,25 @@ footer a{margin:0 10px}
 
   <figure><img src="assets/fig_05_size_adjusted_ranking.png" alt="Size-adjusted complaint risk ranking">
   <figcaption>Red = far riskier than volume suggests · Blue = volume overstates the risk</figcaption></figure>
+</div></section>
+
+<section><div class="wrap">
+  <div class="tag">Interactive</div>
+  <h2>Explore it yourself</h2>
+  <p>The dashboard is published on Tableau Public and reads from four purpose-built PostgreSQL
+  views, so the 500-complaint floor, the resolved-only denominators and the FDIC join all live in
+  versioned SQL rather than in the workbook.</p>
+  <div class="grid">
+    <div class="card"><h4>Size-adjusted risk</h4><p>Ranked bars coloured by how far each company
+      moves between its volume rank and its per-dollar rank.</p></div>
+    <div class="card"><h4>Monthly trend</h4><p>Complaint volume by product across 36 months, on the
+      cleaned taxonomy so the Aug-2023 rename does not read as a surge.</p></div>
+    <div class="card"><h4>Resolution quality</h4><p>Relief rate against untimely rate — the
+      upper-left quadrant is the one that matters.</p></div>
+    <div class="card"><h4>Geography</h4><p>State-level volume and resolution rates across the
+      50 states and DC.</p></div>
+  </div>
+  <p style="margin-top:22px"><a class="btn p" href="https://public.tableau.com/views/banking_complaints_dashboard/Dashboard">Open the dashboard on Tableau Public</a></p>
 </div></section>
 
 <section><div class="wrap">
@@ -301,7 +321,7 @@ footer a{margin:0 10px}
 <footer><div class="wrap">
   <p style="color:#9fb0d0;margin-bottom:14px"><strong style="color:#e6ebf7">Sahil Vashisth</strong>
   &nbsp;·&nbsp; Data Analyst</p>
-  <p><a href="https://github.com/sahilsharma0309/banking-complaints-analysis">GitHub repository</a>·<a href="https://github.com/sahilsharma0309/banking-complaints-analysis/blob/main/reports/insights.md">Business report</a>·<a
+  <p><a href="https://public.tableau.com/views/banking_complaints_dashboard/Dashboard">Live dashboard</a>·<a href="https://github.com/sahilsharma0309/banking-complaints-analysis">GitHub repository</a>·<a href="https://github.com/sahilsharma0309/banking-complaints-analysis/blob/main/reports/insights.md">Business report</a>·<a
      href="https://github.com/sahilsharma0309/banking-complaints-analysis/blob/main/notebooks/eda.ipynb">Analysis notebook</a>·<a
      href="https://github.com/sahilsharma0309/banking-complaints-analysis/blob/main/reports/risk_score_methodology.md">Risk score methodology</a></p>
   <p style="margin-top:18px;font-size:13px">Data: <a

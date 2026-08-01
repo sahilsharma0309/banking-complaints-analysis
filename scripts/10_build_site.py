@@ -20,7 +20,9 @@ DOCS = ROOT / "docs"
 ASSETS = DOCS / "assets"
 
 REPO = "https://github.com/sahilsharma0309/banking-complaints-analysis"
-TABLEAU = "#"          # replace once published to Tableau Public
+# Tracking params (?:sid=, :redirect=, :origin=viz_share_link) stripped -- the
+# bare view URL resolves fine and stays readable in a resume.
+TABLEAU = "https://public.tableau.com/views/banking_complaints_dashboard/Dashboard"
 
 # NOTE: reports/PROJECT_HANDBOOK.pdf is deliberately NOT published here.
 # It is a personal interview-preparation document written in Hinglish -- it
@@ -145,7 +147,8 @@ PAGE = f"""<!doctype html>
   <em>what</em> you complain about.</p>
 
   <div class="cta">
-    <a class="btn p" href="{REPO}">View the code on GitHub</a>
+    <a class="btn p" href="{TABLEAU}">Explore the live dashboard</a>
+    <a class="btn s" href="{REPO}">View the code on GitHub</a>
     <a class="btn s" href="{REPORT}">Read the business report</a>
     <a class="btn s" href="{NOTEBOOK}">Analysis notebook</a>
   </div>
@@ -202,6 +205,25 @@ PAGE = f"""<!doctype html>
 
   <figure><img src="assets/fig_05_size_adjusted_ranking.png" alt="Size-adjusted complaint risk ranking">
   <figcaption>Red = far riskier than volume suggests · Blue = volume overstates the risk</figcaption></figure>
+</div></section>
+
+<section><div class="wrap">
+  <div class="tag">Interactive</div>
+  <h2>Explore it yourself</h2>
+  <p>The dashboard is published on Tableau Public and reads from four purpose-built PostgreSQL
+  views, so the 500-complaint floor, the resolved-only denominators and the FDIC join all live in
+  versioned SQL rather than in the workbook.</p>
+  <div class="grid">
+    <div class="card"><h4>Size-adjusted risk</h4><p>Ranked bars coloured by how far each company
+      moves between its volume rank and its per-dollar rank.</p></div>
+    <div class="card"><h4>Monthly trend</h4><p>Complaint volume by product across 36 months, on the
+      cleaned taxonomy so the Aug-2023 rename does not read as a surge.</p></div>
+    <div class="card"><h4>Resolution quality</h4><p>Relief rate against untimely rate — the
+      upper-left quadrant is the one that matters.</p></div>
+    <div class="card"><h4>Geography</h4><p>State-level volume and resolution rates across the
+      50 states and DC.</p></div>
+  </div>
+  <p style="margin-top:22px"><a class="btn p" href="{TABLEAU}">Open the dashboard on Tableau Public</a></p>
 </div></section>
 
 <section><div class="wrap">
@@ -338,7 +360,7 @@ PAGE = f"""<!doctype html>
 <footer><div class="wrap">
   <p style="color:#9fb0d0;margin-bottom:14px"><strong style="color:#e6ebf7">Sahil Vashisth</strong>
   &nbsp;·&nbsp; Data Analyst</p>
-  <p><a href="{REPO}">GitHub repository</a>·<a href="{REPORT}">Business report</a>·<a
+  <p><a href="{TABLEAU}">Live dashboard</a>·<a href="{REPO}">GitHub repository</a>·<a href="{REPORT}">Business report</a>·<a
      href="{NOTEBOOK}">Analysis notebook</a>·<a
      href="{REPO}/blob/main/reports/risk_score_methodology.md">Risk score methodology</a></p>
   <p style="margin-top:18px;font-size:13px">Data: <a
