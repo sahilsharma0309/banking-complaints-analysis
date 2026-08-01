@@ -70,5 +70,8 @@ desktop.ini
 hyperd.log
 *.log
 
-# Stray copy at repo root; canonical is reports/ and the site copy is docs/
-/PROJECT_HANDBOOK.pdf
+# Personal interview-preparation handbook (Hinglish). Deliberately NOT public:
+# it contains rehearsal scripts, model interview answers and draft resume
+# bullets. Showing a recruiter your prepared answers undercuts the interview.
+# Regenerate any time with: python scripts/09_build_project_pdf.py
+PROJECT_HANDBOOK.pdf

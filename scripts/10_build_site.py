@@ -21,7 +21,16 @@ ASSETS = DOCS / "assets"
 
 REPO = "https://github.com/sahilsharma0309/banking-complaints-analysis"
 TABLEAU = "#"          # replace once published to Tableau Public
-PDF = "PROJECT_HANDBOOK.pdf"
+
+# NOTE: reports/PROJECT_HANDBOOK.pdf is deliberately NOT published here.
+# It is a personal interview-preparation document written in Hinglish -- it
+# contains rehearsal scripts, model answers and draft resume bullets. Showing
+# a recruiter your prepared answers undercuts the interview, and the language
+# makes it unreadable to the intended audience anyway. The public artefacts
+# are the business report, the notebook and the generated logs.
+REPORT = f"{REPO}/blob/main/reports/insights.md"
+NOTEBOOK = f"{REPO}/blob/main/notebooks/eda.ipynb"
+METHOD = f"{REPO}/blob/main/reports/cleaning_log.md"
 
 CSS = """
 :root{--bg:#0b1020;--card:#141b32;--line:#243150;--txt:#e6ebf7;--dim:#9fb0d0;
@@ -137,8 +146,8 @@ PAGE = f"""<!doctype html>
 
   <div class="cta">
     <a class="btn p" href="{REPO}">View the code on GitHub</a>
-    <a class="btn s" href="{PDF}">Full write-up (PDF, 40pp)</a>
-    <a class="btn s" href="{REPO}/blob/main/reports/insights.md">Business report</a>
+    <a class="btn s" href="{REPORT}">Read the business report</a>
+    <a class="btn s" href="{NOTEBOOK}">Analysis notebook</a>
   </div>
 
   <div class="stats">
@@ -302,7 +311,10 @@ PAGE = f"""<!doctype html>
   point — the same construct at 55% of the total weight, crowding out the timeliness signal.
   Measured, removed, rebalanced.</p></div>
 
-  <p>Eighteen in total, documented in the <a href="{PDF}">full write-up</a>.</p>
+  <p>Eighteen in total. Each one is documented where it was found &mdash; in the
+  <a href="{METHOD}">cleaning log</a>, the
+  <a href="{REPO}/blob/main/reports/enrichment_log.md">enrichment log</a>, and the
+  commit history.</p>
 </div></section>
 
 <section><div class="wrap">
@@ -326,9 +338,9 @@ PAGE = f"""<!doctype html>
 <footer><div class="wrap">
   <p style="color:#9fb0d0;margin-bottom:14px"><strong style="color:#e6ebf7">Sahil Vashisth</strong>
   &nbsp;·&nbsp; Data Analyst</p>
-  <p><a href="{REPO}">GitHub repository</a>·<a href="{PDF}">Full write-up (PDF)</a>·<a
-     href="{REPO}/blob/main/reports/insights.md">Business report</a>·<a
-     href="{REPO}/blob/main/notebooks/eda.ipynb">Analysis notebook</a></p>
+  <p><a href="{REPO}">GitHub repository</a>·<a href="{REPORT}">Business report</a>·<a
+     href="{NOTEBOOK}">Analysis notebook</a>·<a
+     href="{REPO}/blob/main/reports/risk_score_methodology.md">Risk score methodology</a></p>
   <p style="margin-top:18px;font-size:13px">Data: <a
     href="https://www.consumerfinance.gov/data-research/consumer-complaints/">CFPB Consumer Complaint
     Database</a> and <a href="https://banks.data.fdic.gov/docs/">FDIC BankFind Suite</a> — both public domain.</p>
@@ -351,10 +363,11 @@ def main() -> None:
         else:
             print(f"  ! missing figure: {f}")
 
-    pdf_src = ROOT / "reports" / "PROJECT_HANDBOOK.pdf"
-    if pdf_src.exists():
-        shutil.copy2(pdf_src, DOCS / PDF)
-        print(f"  asset: {PDF} ({pdf_src.stat().st_size/1024/1024:.2f} MB)")
+    # The Hinglish interview handbook is intentionally not copied here.
+    stale = DOCS / "PROJECT_HANDBOOK.pdf"
+    if stale.exists():
+        stale.unlink()
+        print("  removed stale docs/PROJECT_HANDBOOK.pdf (prep doc, not public)")
 
     # Stops GitHub Pages running the content through Jekyll, which would ignore
     # any file or folder beginning with an underscore.
